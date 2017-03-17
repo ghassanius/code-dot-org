@@ -1,3 +1,4 @@
+require 'base64'
 require 'cdo/aws/s3'
 require 'cdo/rack/request'
 require 'sinatra/base'
@@ -676,6 +677,10 @@ class FilesApi < Sinatra::Base
 
     bad_request unless ['thumbnail.png'].include?(filename)
     filename = ".metadata/#{filename}"
+
+    # The base64-decode is needed for thumbnails, but may not be needed for
+    # other metadata types in the future.
+    body = Base64.urlsafe_decode64(body)
 
     put_file('files', encrypted_channel_id, filename, body)
   end
